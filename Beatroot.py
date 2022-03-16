@@ -7,23 +7,26 @@ Author: Arodi Farrera, Caleb Rascon, Gabriel Ramos-Fernández
 Source code to generate the TXT files containing BPM values used as inputs
 in Dynamic_complexity.R
 
-@author: caleb
+@author: Balkce, ArodiFR, JZacaroli
 """
 
 
 #!/usr/bin/python3
 
-# full paper: https://www.tandfonline.com/doi/abs/10.1076/jnmr.30.1.39.7119
-# implementation 'borrowed' from:
+# BeatRoot full paper: https://www.tandfonline.com/doi/abs/10.1076/jnmr.30.1.39.7119
+# BeatRoot Python implementation based on:
 #    https://github.com/JZacaroli/Beat-Tracking/blob/master/BeatDetection.ipynb
 #
-# requires Parselmouth:
+# requires numpy, soundfile, json pandas
+#                     pip3 install numpy soundfile json pandas
+# also requires Parselmouth:
 #    in Ubuntu 20.04: pip3 install praat-parselmouth
 #    in Ubuntu 18.04, run with python3 and:
 #                     pip3 install cmake
 #                     pip3 install scikit-build
 #                     pip3 install praat-parselmouth
 #                     pip3 install soundfile
+
 
 import os
 import sys
@@ -33,6 +36,8 @@ import numpy as np
 import json
 from parselmouth.praat import call
 import soundfile
+import pandas as pd
+
 
 def f0_array(sound, timeStep = 0.005):
     
@@ -591,6 +596,11 @@ if __name__ == "__main__":
         audio_onset[wave_file_basename]["start"] = [value for value in audio_onset[wave_file_basename]["start"] if value != -1]
         audio_onset[wave_file_basename]["end"] = [value for value in audio_onset[wave_file_basename]["end"] if value != -1]
         
+        #save BPM data of this audio file in separate text file
+        data= pd.DataFrame({'start': audio_onset[wave_file_basename]["start"], 'end': audio_onset[wave_file_basename]["end"],'bpm': audio_onset[wave_file_basename]["bpm"]})
+        data.to_csv(str(str('./') + 'BPM_' + str(wave_file_basename.rsplit('.', 1)[0]) + '.txt'), sep='\t')
+        
+        #at the end of the analysis of each audio file, save progress in json file
         onset_file = open(json_basename+"__bpm.json", "w")
         json.dump(audio_onset, onset_file)
         onset_file.close()
