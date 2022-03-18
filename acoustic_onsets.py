@@ -200,8 +200,13 @@ for wave_file in glob.glob("*.wav", recursive = False):
             f_shortinterv.append(interv_onset)
             f_shortvowel.append(vowel_onset)
 
-        
-    np.savetxt(str(str(newpath) +'FRAME_longintS_' + str(wave_file.rsplit('.', 1)[0]) + '.txt'), f_interventionactivity[0], fmt='%1.0f', delimiter=",")
-    np.savetxt(str(str(newpath) +'FRAME_longintE_' + str(wave_file.rsplit('.', 1)[0]) + '.txt'), f_interventionactivity[1], fmt='%1.0f', delimiter=",")
-    np.savetxt(str(str(newpath) +'FRAME_shortintS_' + str(wave_file.rsplit('.', 1)[0]) + '.txt'), np.hstack(f_shortinterv), fmt='%1.0f', delimiter=",")
+
+                  
+# FRAME_longintS.txt: starts of long interventions                  
+#    np.savetxt(str(str(newpath) +'FRAME_longintS_' + str(wave_file.rsplit('.', 1)[0]) + '.txt'), f_interventionactivity[0], fmt='%1.0f', delimiter=",")
+# FRAME_longintE.txt: ends of long interventions 
+#    np.savetxt(str(str(newpath) +'FRAME_longintE_' + str(wave_file.rsplit('.', 1)[0]) + '.txt'), f_interventionactivity[1], fmt='%1.0f', delimiter=",")
+# FRAME_shortintS.txt: starts of interventions where f0 is present
+#    np.savetxt(str(str(newpath) +'FRAME_shortintS_' + str(wave_file.rsplit('.', 1)[0]) + '.txt'), np.hstack(f_shortinterv), fmt='%1.0f', delimiter=",")
+# FRAME_shortvowel.txt: f0 activity onsets used in dynamic_complexity.R
     np.savetxt(str(str(newpath) +'FRAME_shortvowel_' + str(f_f0array[5]) +'_' + str(wave_file.rsplit('.', 1)[0]) + '.txt'), np.hstack(f_shortvowel), fmt='%1.0f', delimiter=",")
