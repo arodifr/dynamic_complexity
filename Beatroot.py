@@ -7,6 +7,8 @@ Author: Arodi Farrera, Caleb Rascon, Gabriel Ramos-Fernández
 Source code to generate the TXT files containing BPM values used as inputs
 in Dynamic_complexity.R
 
+Python version 3.8.8 (default, Apr 13 2021, 15:08:03) [MSC v.1916 64 bit (AMD64)]
+
 @author: Balkce, ArodiFR, JZacaroli
 """
 
