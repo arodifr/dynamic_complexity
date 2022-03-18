@@ -36,6 +36,7 @@
 #     Visualizing and Analyzing Behavioral Time Series. Technology and Code. 
 #     doi: 10.3389/fpsyg.2020.01457
 
+# R version 4.0.2 (2020-06-22)
 
 
 
