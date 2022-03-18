@@ -50,14 +50,14 @@ def f0_array(sound, timeStep = 0.005):
     #### ALL ABOUT PITCH ####
     #########################
 
-# Obtiene valores de f0 (sound.to_pitch, pitch.selected_array)
+# Obtains f0 values (sound.to_pitch, pitch.selected_array)
     pitch = sound.to_pitch(time_step = timeStep, pitch_floor = 60, pitch_ceiling = 600)
     pitch_values = pitch.selected_array['frequency']
     min_pitch = min(pitch_values[pitch_values != 0])
 
-# La clase de los objetos que regresan esas funciones son muy especificas
-# asi que los pasos siguientes son para obtener un vector (f0_array) 
-# con longitud = numero de samples y donde los valores de f0 esten en los frames correspondientes 
+# These outputs are a very specific class 
+# so we need the next steps to obtain a vector (f0_array) 
+# of length = number of samples and the index of the given f0 values 
     
     fzero_to_data_ratio = int(length_samp/pitch_values.shape[0])
     f0_array = np.zeros(length_samp)
@@ -65,8 +65,8 @@ def f0_array(sound, timeStep = 0.005):
     for i in range(0, pitch_values.shape[0]):
         f0_array[i*fzero_to_data_ratio:(i+1)*fzero_to_data_ratio] = pitch_values[i]
     
-# Regresa f0_array y otros datos que se ocupan en otras funciones
-# length_sec = duracion en segundos; length_samp = numero de muestras
+# It returns f0_array and other data that we will need in other functions
+# Length_sec = duration (s.); length_samp = sample size
     return f0_array, min_pitch, samplerate, time, length_secs, length_samp
 
 
@@ -74,16 +74,15 @@ def f0_array(sound, timeStep = 0.005):
     
 def f0_activity_frame(f0_array, time, vowel_treshold = 0.05):
     """START AND END TIME of any f0 activity"""
-# Obtiene los frames en donde el f0 es mayor a 0 (ahora que lo pienso parece redundante
-# pero estoy segura que tiene una explicacion logica)
+# Index of where f0 is greater than 0 
     vowel_starts_index = [i for i, e in enumerate(f0_array) if e > 0]
     vowel_start_frame = []
     vowel_ends_frame = []
     vowel_start_frame.append(vowel_starts_index[0])
 
-# si el tiempo que pasa entre la actividad Y y X supera un umbral (vowel_threshold)
-# seguro es una nueva vocal/silaba
-# se guarda el frame de esa nueva vocal
+# if the time between activity Y and X exceeds a threshold (vowel_threshold)
+# then a voiced sound
+# We save this index for later 
 
     for (x, y) in zip(tuple(vowel_starts_index[1:]), tuple(vowel_starts_index)):
         if time[x] - time[y] > vowel_treshold:
@@ -94,9 +93,9 @@ def f0_activity_frame(f0_array, time, vowel_treshold = 0.05):
     IOIstart_vowel_timeFrame = np.array(vowel_start_frame) #when the IOI starts
     IOIend_vowel_timeFrame = np.array(vowel_ends_frame)
 
-# Regresa vectores con los valores de inicio (IOIstart) y final (IOIend)
-# de una vocal (i.e. actividad de f0 delimitada por espacios sin actividad de f0 
-# > vowel_treshold  -me falto una h en threshold)
+# Returns arrays with start (IOIstart) and end (IOIend) 
+# of the voiced sound (i.e. f0 activity delimited by moments of inactivity).
+# vowel_treshold  -I misspelled threshold
     return IOIstart_vowel_timeFrame, IOIend_vowel_timeFrame
 
 
@@ -106,28 +105,27 @@ def intervention_activity_frame(sound, f0_array, min_pitch, time, int_threshold 
     #################################
 
     """START AND END TIME of an intervention"""
-# Funciones para obtener actividad acustica de Praat
-# (to_intensity): buscar sound:to intensity
-# (intensity): buscar Intensity: to textgrid(silences)
+# In praat, you can look for these functions like this
+# (to_intensity): in Praat look for (sound:to intensity) 
+# (intensity): in Praat look for (Intensity: to textgrid(silences))
 
     intensity = sound.to_intensity(int(min_pitch))
     textgrid = call(intensity, "To TextGrid (silences)", int_threshold, minpause, 0.1, "silent", "sounding")
     silencetier = call(textgrid, "Extract tier", 1)
-# Pasos solo para volver el objeto a una tabla de datos numericos
+# The next steps are necessary to obtain a table with numeric values
     silencetable = call(silencetier, "Down to TableOfReal", "sounding")
     npauses = call(silencetable, "Get number of rows")
     interv_start_time = []
     interv_end_time = []
  
-# tabla con el inicio y final (s) de las intervenciones    
+# Table with the beginning and end of interventions   
     for i in range(1, npauses+1):
         interv_start_time.append(call(silencetable, "Get value", i, 1))
         interv_end_time.append(call(silencetable, "Get value", i, 2))
 
-# Pasos para saber si en el rango temporal de las intervenciones 
-# existen valores de f0
+# Steps to know whether there are f0 values within an intervention 
 
-# obtiene el frame equivalente a los datos temporales obtenidos en el paso anterior
+# Obtains the index of data in the previous step
     """Only voiced (f0) intervention, either vowel or consonant (not voiceless utterances)"""
     time_round = np.round(time, 7)
     interv_starts = [round(i, 2) for i in interv_start_time]
@@ -135,25 +133,25 @@ def intervention_activity_frame(sound, f0_array, min_pitch, time, int_threshold 
     interv_ends = [round(i, 4) for i in interv_end_time]
     interv_end_frame = np.searchsorted(time_round, interv_ends)
     
-# vector logico sobre si existen valores de f0
+# Boolean, whether there are f0 values 
     interv_index_bool = []
     for (x, y) in zip(tuple(interv_start_frame), tuple(interv_end_frame)):
         interv_index_bool.append(not all(f0_array[x:y] == 0))
 
-# para quedarnos solo con las intervenciones que tienen valores de f0
+# to keep only interventions with f0 values
     interv_start_frame_f0 = interv_start_frame[interv_index_bool]
     interv_end_frame_f0 = interv_end_frame[interv_index_bool]
 
     IOIstart_intervention_timeFrame = np.array(interv_start_frame_f0)
     IOIend_intervention_timeFrame = np.array(interv_end_frame_f0)
 
-# inicio y final (s) de las intervenciones con f0 para una funcion posterior (get_interv_wav) 
-# que segmenta el audio completo en intervenciones y las guarda 
+# Beginning and end of interventions with f0, which can be used 
+# in another function (get_interv_wav) that segments the audio file into interventions and saves them. 
     """START AND END TIME of voiced interventions"""
     interv_x_index = [time[i] for i in interv_start_frame_f0]
     interv_y_index = [time[i] for i in interv_end_frame_f0-1]
 
-# Regresa los frames de las intervenciones    
+# Returns the index of the interventions    
     return IOIstart_intervention_timeFrame, IOIend_intervention_timeFrame, interv_x_index, interv_y_index
 
 
@@ -162,8 +160,8 @@ def intensity_peak_activity_frame(sound, min_pitch, samplerate, threshold):
     #############################
     #### ALL ABOUT INTENSITY ####   
     #############################
-# utiliza la misma funcion que antes (to_intensity)
-# y regresa el tiempo y la intensidad de todos los picos
+# Uses the same previous function (to_intensity) 
+# and returns the moment and intensity of every peak
 
     intensity = sound.to_intensity(int(min_pitch))
     intensity_peaks = call(intensity, "To IntensityTier (peaks)")
@@ -183,7 +181,7 @@ def intensity_peak_activity_frame(sound, min_pitch, samplerate, threshold):
             peak_time_thres.append(x)
             peak_intensity_thres.append(y)
 
-# se obtiene el frame de dichos picos
+# Obtains the index of said peaks
     IOI_intensity_timeFrame = np.array([int(i*samplerate) for i in peak_time_thres])
     
     return IOI_intensity_timeFrame
