@@ -2,7 +2,7 @@
 # Article: Structural complexity of the long-term collective rhythm of 
 #          naturalistic conversations.
 # Year: 2022
-# Author: Arodi Farrera, Caleb Rascon, Gabriel Ramos-Fern·ndez
+# Author: Arodi Farrera, Caleb Rascon, Gabriel Ramos-Fern√°ndez
 
 
 
@@ -11,25 +11,25 @@
 # one meeting as an example.
 # This code is divided into three main sections
 # 1. DATA: 
-# 1.1. Acoustic Data: reading TXT files containing acoustic onsets for one 
-#      meeting. These files come from THE PYTHON CODE
+# 1.1. Acoustic Data: reading the TXT file containing acoustic onsets for one 
+#      meeting. This file comes from THE PYTHON CODE
 # 1.1.1. Types of time series: steps to generate the three types of time series:
 #        Observed, Random, and Isochronous (see Figure 1.A).
 # 1.2. BPM data: reading the TXT file containing the BPM values for intervention
 
 # 2. METRICS:
 # 2.1. Burstiness: code to compute the B parameter
-# 2.2. RQA: code to compute %DET, %LAM, ENTR
-# 2.3. Allan factor analysis: code to compute the exponent alpha
+# 2.2. Allan factor analysis: code to compute the exponent alpha
+# 2.3. RQA: code to compute %DET, %LAM, ENTR
 
 # 3. PLOTS:
 # 3.1. 3D Plot: code to generate the 3D plot of median values for all 
 #               types of time series and all meetings (Figure 2)
-# 3.2. Over time: code to generate Figure 4 showing the dynamic structural
-#                 organization and tempo characteristic of the selected meeting
-# 3.3. Boxplots: code to generate Figure 3, but instead of comparing different
+# 3.2. Boxplots: code to generate Figure 3, but instead of comparing different
 #                meetings, it compares the selected meeting against the
-#                random and isochronous versions when appropriate.
+#                random and isochronous versions, when appropriate.
+# 3.3. Over time: code to generate Figure 4 showing the dynamic structural
+#                 organization and tempo characteristic of the selected meeting
 
 ## The functions used in section 2.METRICS were adapted from:
 # Xu, L., de Barbaro, Abney, D., Cox, R. (2020). Finding Structure in Time: 
@@ -55,11 +55,7 @@ library("patchwork")
 
 #### 1.DATA ####
 #### 1.1.Acoustic data ####
-filenames <- dir(pattern = "*Mix-Headset.txt")
 samplerate <- 16000
-IOIstart <- read.table("FRAME_longintS_EN2002b.Mix-Headset.txt")
-IOIend <- read.table("FRAME_longintE_EN2002b.Mix-Headset.txt")
-IOIstartS <- read.table("FRAME_shortintS_EN2002b.Mix-Headset.txt")
 IOIvowel <- read.table("FRAME_shortvowel_28589568_EN2002b.Mix-Headset.txt")
 
 #### 1.1.1.Types of time series ####
@@ -255,20 +251,7 @@ discIsonoise$LAM <- c(recur$LAM, NAs)
 
 
 
-
-
-
-
-## Joining discIOI and BPM2b
-# patron <- BPM2b$start.s
-# time <- data.frame(time = seq(1, length(discIOI$time)))
-# seconds <- data.frame(table(floor(patron)))
-# seconds$BPM <- BPM2b$bpm 
-# colnames(seconds) <- c("time", "Sec", "BPM")
-# seconds$time <- as.numeric(as.character(seconds$time))
-# timeBPM <- left_join(time,seconds, by = "time") 
-# discIOI <- left_join(discIOI, timeBPM[,-2], by = "time")
-
+## Adding some variables to the DFs and better names
 obsEN2002b <- discIOI
 obsEN2002b$meeting <- "EN2002b" 
 obsEN2002b$type <- "Observed" 
@@ -331,8 +314,12 @@ f %>% layout(scene = list(annotations = list(
 
 
 #### 3.2.Boxplots ####
+DFtime <- rbind(obsEN2002b, ranEN2002b, isoEN2002b)
+DFtime$type <- factor(DFtime$type, levels = c("Observed", "Random", "Isochronous"))
+paleta <- hcl.colors(5, "Viridis")[c(2, 4, 5)]
+
 # B metric compared to random and periodic versions
-e <- ggplot(DFtime, 
+a <- ggplot(DFtime, 
             aes(x = type, y = B, fill = type))+
   geom_boxplot() + theme_bw() + ylim(c(-1, 1)) +
   theme(strip.background = element_blank(),
@@ -342,7 +329,7 @@ e <- ggplot(DFtime,
   scale_fill_manual(values=c(paleta))
 
 # Exponent alpha compared to random and periodic versions
-f <- ggplot(DFtime, aes(x = type, y = alpha, fill = type))+
+b <- ggplot(DFtime, aes(x = type, y = alpha, fill = type))+
   geom_boxplot() + theme_bw() + ylim(c(-1, 1)) +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
@@ -351,7 +338,7 @@ f <- ggplot(DFtime, aes(x = type, y = alpha, fill = type))+
   scale_fill_manual(values=c(paleta))
 
 # Entropy compared to random and periodic versions
-g <- ggplot(DFtime, aes(x = type, y = entropy, fill = type))+
+c <- ggplot(DFtime, aes(x = type, y = entropy, fill = type))+
   geom_boxplot() + theme_bw() + ylim(c(0, 5)) +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
@@ -360,7 +347,7 @@ g <- ggplot(DFtime, aes(x = type, y = entropy, fill = type))+
   scale_fill_manual(values=c(paleta))
 
 # %DET compared to random and periodic versions
-h <- ggplot(DFtime, aes(x = type, y = DET, fill = type))+
+d <- ggplot(DFtime, aes(x = type, y = DET, fill = type))+
   geom_boxplot() + theme_bw() + ylim(c(0, 100)) +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
@@ -369,7 +356,7 @@ h <- ggplot(DFtime, aes(x = type, y = DET, fill = type))+
   scale_fill_manual(values=c(paleta))
 
 # %LAM compared to random and periodic versions
-i <- ggplot(DFtime, aes(x = type, y = LAM, fill = type))+
+e <- ggplot(DFtime, aes(x = type, y = LAM, fill = type))+
   geom_boxplot() + theme_bw() + ylim(c(0, 100)) +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
@@ -378,7 +365,7 @@ i <- ggplot(DFtime, aes(x = type, y = LAM, fill = type))+
   scale_fill_manual(values=c(paleta))
 
 # BPM 
-j <- ggplot(BPM2b, aes(x = meeting, y = bpm, fill = meeting))+
+f <- ggplot(BPM2b, aes(x = meeting, y = bpm, fill = meeting))+
   geom_boxplot() + theme_bw() + ylim(c(40, 200)) +
   theme(strip.background = element_blank(),
         strip.text.y = element_blank(),
@@ -386,21 +373,16 @@ j <- ggplot(BPM2b, aes(x = meeting, y = bpm, fill = meeting))+
         legend.position = "none") + ylab("BPM") +
   scale_fill_manual(values=c(paleta[1]))  
 
-etoj <- (e + f + g ) / (h + i + j) + plot_layout(ncol = 1, guides = "collect")
+atof <- (a + b + c ) / (d + e + f) + plot_layout(ncol = 1, guides = "collect")
 # Saving the plot
 file_name = paste("./Summary", ".png", sep = "")
-etoj
+atof
 ggsave(file_name, device = "tiff", width=15, height=10, dpi=150, units="in", compression = "lzw")
 
 
 #### 3.3.Over time: b, alpha, entropy, acceleration ####
-head(obsEN2002b)
-DFtime <- rbind(obsEN2002b, ranEN2002b, isoEN2002b)
-DFtime$type <- factor(DFtime$type, levels = c("Observed", "Random", "Isochronous"))
-
-paleta <- hcl.colors(5, "Viridis")[c(2, 4, 5)]
 # B metric over time
-a <- ggplot(DFtime, aes(x = time, y = B, color = type)) +
+g <- ggplot(DFtime, aes(x = time, y = B, color = type)) +
   geom_line(size = 0.5) + ylim(c(-1, 1)) + xlim(c(0, 1700))+
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -409,14 +391,14 @@ a <- ggplot(DFtime, aes(x = time, y = B, color = type)) +
         text = element_text(size = 30)) + 
   scale_colour_manual(values = paleta) + ylab("B")
 
-a <- tag_facet(a, 
+g <- tag_facet(g, 
                x = -Inf, y = 1, 
                open = "", close = "",
                size = 10,
                tag_pool = "EN2002b")
 
 # Exponent alpha over time
-b <- ggplot(DFtime, aes(x = time, y = alpha, color = type)) +
+h <- ggplot(DFtime, aes(x = time, y = alpha, color = type)) +
   geom_line(size = 0.5) + ylim(c(-1, 1)) + xlim(c(0, 1700))+
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -426,7 +408,7 @@ b <- ggplot(DFtime, aes(x = time, y = alpha, color = type)) +
   scale_colour_manual(values = paleta) + ylab("Alpha")
 
 # Entropy over time
-c <- ggplot(DFtime, aes(x = time, y = entropy, color = type)) +
+i <- ggplot(DFtime, aes(x = time, y = entropy, color = type)) +
   geom_line(size = 0.5) + ylim(c(0, 6)) + xlim(c(0, 1700))+
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -436,7 +418,7 @@ c <- ggplot(DFtime, aes(x = time, y = entropy, color = type)) +
   scale_colour_manual(values = paleta) + ylab("Entropy")
 
 # BPM acceleration over time
-d <- ggplot(BPM2b, aes(x = start/samplerate, y = acc)) +
+j <- ggplot(BPM2b, aes(x = start/samplerate, y = acc)) +
   geom_line(size = 0.5, color = paleta[1]) + xlim(c(0, 1700))+
   ylim(c(-20, 25))+ 
   theme_bw() +
@@ -448,10 +430,10 @@ d <- ggplot(BPM2b, aes(x = start/samplerate, y = acc)) +
 
 
 
-abcd <- (a + b + c + d) + plot_layout(ncol = 1, guides = "collect")
+gtoj <- (g + h + i + j) + plot_layout(ncol = 1, guides = "collect")
 # Saving the plot
 file_name = paste("./Overtime", ".png", sep = "")
-abcd
+gtoj
 ggsave(file_name, device = "tiff", width=15, height=20, dpi=150, units="in", compression = "lzw")
 
 
