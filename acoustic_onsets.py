@@ -8,6 +8,8 @@ Author: Arodi Farrera, Caleb Rascon, Gabriel Ramos-Fernández
 Source code to generate the TXT files containing acoustic onsets used as inputs
 in Dynamic_complexity.R
 
+Python version 3.8.8 (default, Apr 13 2021, 15:08:03) [MSC v.1916 64 bit (AMD64)]
+
 Created on Tue May 18 16:44:08 2021
 @author: arodi
 """
