@@ -397,15 +397,3 @@ file_name = paste("./Overtime", ".png", sep = "")
 gtoj
 ggsave(file_name, device = "tiff", width=15, height=20, dpi=150, units="in", compression = "lzw")
 
-
-
-na.omit(BPM2b) %>% 
-  mutate(acumulada = cumsum(acc)) %>% 
-  ggplot(data = ., aes(x=start/samplerate, y=acumulada)) + 
-  geom_line(size = 0.5) + 
-  xlim(c(0, 1700)) + theme_bw() +
-  theme(strip.background = element_blank(),
-        strip.text.y = element_blank(),
-        text = element_text(size = 15)) + 
-  scale_colour_manual(values = paleta[1]) +
-  xlab("Time (s.)") + ylab("Cumulative \n Acceleration")
