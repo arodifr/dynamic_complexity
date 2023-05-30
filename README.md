@@ -5,8 +5,7 @@ Source code to generate all the analyzes of the article "Structural complexity o
 Applying the following workflow to the audios of the six analyzed meetings (EN2001d, EN2001e, EN2001a, EN2002b, EN2002a and EN2001b) will deliver the results presented in the article. These audios are part of the AMI Corpus (Carletta et al., 2006), which can be found at https://groups.inf.ed.ac.uk/ami/corpus/.   
    
 
-![This is an image](https://github.com/arodifr/dynamic_complexity/blob/main/Figure1.jpg)
-
+![This is an image](https://github.com/arodifr/dynamic_complexity/blob/main/Figure1.png)
 
 To make the code more readable, we exemplify this workflow using only one of these meetings (EN2002b). This workflow requires using Python version 3.8.8 and R studio version 4.3.0. 
 
