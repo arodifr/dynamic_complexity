@@ -2,7 +2,7 @@
 """
 Article: Structural complexity of the long-term collective rhythm of 
          naturalistic conversations.
-Year: 2022¿3
+Year: 2022-2023
 Author: Arodi Farrera, Caleb Rascon, Gabriel Ramos-Fernández
 Source code to generate the TXT files containing acoustic onsets used as inputs
 in Dynamic_complexity.R
