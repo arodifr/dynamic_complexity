@@ -242,29 +242,3 @@ h_patch
 ggsave(file_name, h_patch, device = "tiff",
        width=20, height=15, dpi=150, units="in", compression = "lzw")
 
-#
-
-
-# cumacc <- na.omit(bpmDF) %>% 
-#   group_by(Meeting) %>%
-#   mutate(acumulada = cumsum(Acceleration)) %>% 
-#   ggplot(data = ., aes(x=Time, y=acumulada)) + 
-# #  geom_point(color = paleta[1], alpha = 0.40)+ 
-#   geom_line(size = 0.5, color = paleta[1])+
-#   facet_wrap(~Meeting, nrow = 3)+
-#   theme_bw() + xlim(0, 5100)+
-#   theme(strip.background = element_blank(),
-#         strip.text.y = element_blank(),
-#         text = element_text(size = 20)) + 
-#   theme(legend.key.size = unit(1.5, 'cm'),
-#         legend.text = element_text(size=20))+ 
-#   scale_colour_manual(values = paleta[1]) +
-#   xlab("Time (s.)") + ylab("Cumulative Acceleration")
-# 
-# file_name = paste("./.suppAcc", ".png", sep = "")
-# cumacc
-# ggsave(file_name, cumacc, device = "tiff", 
-#        width=20, height=20, dpi=150, units="in", compression = "lzw")
-# 
-
-  
