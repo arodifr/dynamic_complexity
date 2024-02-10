@@ -16,6 +16,7 @@ import glob
 import parselmouth
 import numpy as np
 import os
+import sys
 from parselmouth.praat import call
 
 
@@ -41,7 +42,10 @@ def f0_array(sound, timeStep):
 
     pitch = sound.to_pitch(time_step = timeStep, pitch_floor = 75, pitch_ceiling = 300)
     pitch_values = pitch.selected_array['frequency']
-    min_pitch = min(pitch_values[pitch_values != 0])    
+    if len(pitch_values[pitch_values != 0]) > 0:
+        min_pitch = min(pitch_values[pitch_values != 0])
+    else:
+        min_pitch = -1
     fzero_to_data_ratio = int(length_samp/pitch_values.shape[0])
     f0_array = np.zeros(length_samp)
     
@@ -115,9 +119,12 @@ def intervention_activity_frame(f0_array, min_pitch, time, minpause):
 
     return IOIstart_intervention_timeFrame, IOIend_intervention_timeFrame, interv_x_index, interv_y_index
 
+#python acoustic_onsets.py "/home/balkce/Documents/databases/AMICorpus/amicorpus/IN10*/audio/*Mix*.wav"
+
 #for wave_file in glob.glob("*.wav", recursive = False):
 #for wave_file in glob.glob("**/*.wav", recursive = True):
-for wave_file in glob.glob("./mixes/EN2002b.Mix-Headset.wav", recursive = False):
+#for wave_file in glob.glob("./mixes/EN2002b.Mix-Headset.wav", recursive = False):
+for wave_file in glob.glob(sys.argv[1], recursive = True):
     f_f0array = []
     f_f0array_short = []
     f_f0activity_start = []
@@ -139,12 +146,13 @@ for wave_file in glob.glob("./mixes/EN2002b.Mix-Headset.wav", recursive = False)
             print("{:.2f}".format(y/f_f0array[4]*100)+"% :: "+str(x)+" -> "+str(y)+" : extracting")
             snd_part = sound.extract_part(from_time = x, 
                             to_time = y, preserve_times=True)
-        
+            
             f_f0array_short = f0_array(snd_part, timeStep_short)
-           
-            f_f0activity_start = np.array(f0_activity_frame(f_f0array_short[0], f_f0array_short[3], vowel_treshold)[2])
-            vowel_onset = f_f0activity_start * f_f0array_short[2]
-            f_shortvowel.append(vowel_onset)
+            
+            if f_f0array_short[1] != -1:
+                f_f0activity_start = np.array(f0_activity_frame(f_f0array_short[0], f_f0array_short[3], vowel_treshold)[2])
+                vowel_onset = f_f0activity_start * f_f0array_short[2]
+                f_shortvowel.append(vowel_onset)
         else:
             print("{:.2f}".format(y/f_f0array[4]*100)+"% :: "+str(x)+" -> "+str(y)+" : ---")
     print("100.0% :: Done.")
